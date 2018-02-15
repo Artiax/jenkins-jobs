@@ -3,9 +3,9 @@ folder('images');
 [
 
 
-  [name: 'jenkins', repository: 'https://github.com/Artiax/kubernetes.git', branch: 'development'],
-  [name: 'jenkins-slave', repository: 'https://github.com/Artiax/kubernetes.git', branch: 'development'],
-  [name: 'httpd', repository: 'https://github.com/Artiax/kubernetes.git', branch: 'development'],
+  [name: 'jenkins', repository: 'https://github.com/Artiax/kubernetes.git', branch: 'master'],
+  [name: 'jenkins-slave', repository: 'https://github.com/Artiax/kubernetes.git', branch: 'master'],
+  [name: 'httpd', repository: 'https://github.com/Artiax/kubernetes.git', branch: 'master'],
 
 
 ].each { Map image ->

@@ -3,8 +3,8 @@ folder('deployments');
 [
 
 
-  [ name: 'jenkins', repository: 'https://github.com/Artiax/kubernetes.git', branch: 'development' ],
-  [ name: 'httpd', repository: 'https://github.com/Artiax/kubernetes.git', branch: 'development' ],
+  [ name: 'jenkins', repository: 'https://github.com/Artiax/kubernetes.git', branch: 'master' ],
+  [ name: 'httpd', repository: 'https://github.com/Artiax/kubernetes.git', branch: 'master' ],
 
 
 ].each { Map deployment ->
