@@ -23,11 +23,11 @@ folder('deployments');
 
                     stage('Deploy') {
                         dir('charts') {
-                            sh '''#!/bin/bash
+                            sh """#!/bin/bash
                                 TILLER_PORT=$(kubectl get svc -n kube-system tiller -o jsonpath='{.spec.ports[].port}')
                                 export HELM_HOST=&quot;tiller.kube-system.svc.cluster.local:$TILLER_PORT&quot;
                                 helm upgrade ${RELEASE_NAME} ./$(deployment.name} --install --set deployment.imageTag=${TAG}
-                            '''
+                            """
                         }
                     }
                 }
