@@ -14,7 +14,7 @@ folder('deployments');
       }
       definition {
           cps {
-              script(/
+              script($/
                 echo 'Spawning a slave for this job...'
 
                 node('docker') {
@@ -32,7 +32,7 @@ folder('deployments');
                         }
                     }
                 }
-              /.stripIndent())
+              /$.stripIndent())
               sandbox(true)
           }
       }
