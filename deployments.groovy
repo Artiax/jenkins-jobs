@@ -3,7 +3,6 @@ folder('deployments');
 [
 
 
-  [ name: 'jenkins', repository: 'https://github.com/Artiax/kubernetes.git', branch: 'master' ],
   [ name: 'httpd', repository: 'https://github.com/Artiax/kubernetes.git', branch: 'master' ],
 
 
@@ -15,17 +14,18 @@ folder('deployments');
       definition {
           cps {
               script($/
-                  echo 'Spawning a slave for this job...'
-
                   node('docker') {
                       stage('Clone') {
                           git branch: '${deployment.branch}', url: '${deployment.repository}', changelog: false, poll: false
                       }
 
                       stage('Deploy') {
-                          dir('deployments') {
-                              sh 'sed -ri "s/(image:.*${deployment.name}:)[a-z0-9\\.]*/\\1$$TAG/" ${deployment.name}.yaml'
-                              sh 'kubectl apply --record -f ${deployment.name}.yaml'
+                          dir('charts') {
+                              sh '''#!/bin/bash
+                                  TILLER_PORT=$(kubectl get svc -n kube-system tiller -o jsonpath='{.spec.ports[].port}')
+                                  export HELM_HOST="tiller.kube-system.svc.cluster.local:$TILLER_PORT"
+                                  helm upgrade ${RELEASE_NAME} ./${deployment.name} --install --set deployment.imageTag=${TAG}
+                              '''
                           }
                       }
                   }
