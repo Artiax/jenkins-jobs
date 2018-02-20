@@ -22,7 +22,7 @@ folder('deployments');
 
                     stage('Deploy') {
                         dir('charts') {
-                            sh 'helm upgrade ${RELEASE_NAME} ./${deployment.name} --install --set deployment.imageTag=${TAG} --host tiller.kube-system.svc.cluster.local:44134'
+                            sh 'helm upgrade \${RELEASE_NAME} ./${deployment.name} --install --set deployment.imageTag=\${TAG} --host tiller.kube-system.svc.cluster.local:44134'
                         }
                     }
                 }
