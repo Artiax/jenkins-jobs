@@ -1,5 +1,17 @@
+def name;
+def tag;
+def image;
+
 node('docker') {
-  def image;
+  stage('Prepare') {
+    name = sh(returnStdout: true, script: 'basename -s .git $(git config --get remote.origin.url)')
+    commit = sh(returnStdout: true, script: 'git rev-parse HEAD').trim().take(8)
+    timestamp = sh(returnStdout: true, script: "date '+%Y-%m-%d-%H%M'").trim()
+    tag = "${timestamp}-${commit}"
+
+    echo "Name: ${name}"
+    echo "Tag: ${tag}"
+  }
 
   stage('Build') {
     currentBuild.displayName = "${tag}"
@@ -9,14 +21,5 @@ node('docker') {
   stage('Tag') {
     image.tag "${tag}"
     image.tag "latest"
-  }
-}
-
-timeout(time: 15, unit: 'MINUTES') {
-  try {
-    input(id: 'deploy', message: 'Deploy this image?')
-    build job: 'deployments/${metadata.name}', parameters: [string(name: 'RELEASE_NAME', value: 'jenkins'),string(name: 'TAG', value: "${tag}")], wait: false
-  } catch(err) {
-    currentBuild.result = 'SUCCESS'
   }
 }
