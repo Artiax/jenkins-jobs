@@ -1,21 +1,12 @@
-def image;
-def tag;
-
 node('docker') {
-  stage('Clone') {
-    git branch: '${image.branch}', url: '${image.repository}', changelog: false, poll: false
-    commit = sh(returnStdout: true, script: "git rev-parse HEAD").trim().take(8)
-    timestamp = sh(returnStdout: true, script: "date '+%Y-%m-%d-%H%M'").trim()
-    tag = "${timestamp}-${commit}"
-  }
+  def image;
 
   stage('Build') {
     currentBuild.displayName = "${tag}"
-    image = docker.build '${image.name}'
+    image = docker.build '${name}'
   }
 
   stage('Tag') {
-
     image.tag "${tag}"
     image.tag "latest"
   }
@@ -24,7 +15,7 @@ node('docker') {
 timeout(time: 15, unit: 'MINUTES') {
   try {
     input(id: 'deploy', message: 'Deploy this image?')
-    build job: 'deployments/${image.name}', parameters: [string(name: 'RELEASE_NAME', value: 'jenkins'),string(name: 'TAG', value: "${tag}")], wait: false
+    build job: 'deployments/${metadata.name}', parameters: [string(name: 'RELEASE_NAME', value: 'jenkins'),string(name: 'TAG', value: "${tag}")], wait: false
   } catch(err) {
     currentBuild.result = 'SUCCESS'
   }
