@@ -20,43 +20,21 @@ folder('images');
 
 ].each { Map image ->
   pipelineJob("images/${image.name}") {
-    definition {
-      cps {
-        sandbox(true)
-        script("""
-          def image;
-          def tag;
-
-          node('docker') {
-            stage('Clone') {
-              git branch: '${image.branch}', url: '${image.repository}', changelog: false, poll: false
-              commit = sh(returnStdout: true, script: "git rev-parse HEAD").trim().take(8)
-              timestamp = sh(returnStdout: true, script: "date '+%Y-%m-%d-%H%M'").trim()
-              tag = "${timestamp}-${commit}"
-            }
-
-            stage('Build') {
-              currentBuild.displayName = "${tag}"
-              image = docker.build '${image.name}'
-            }
-
-            stage('Tag') {
-
-              image.tag "${tag}"
-              image.tag "latest"
-            }
+      definition {
+          cpsScm {
+              scm {
+                  git {
+                      branch("${image.branch}")
+                      remote {
+                          url("${image.repository}")
+                      }
+                  }
+              }
+              scriptPath("Jenkinsfile")
           }
-
-          timeout(time: 15, unit: 'MINUTES') {
-            try {
-              input(id: 'deploy', message: 'Deploy this image?')
-              build job: 'deployments/${image.name}', parameters: [string(name: 'RELEASE_NAME', value: 'jenkins'),string(name: 'TAG', value: "${tag}")], wait: false
-            } catch(err) {
-              currentBuild.result = 'SUCCESS'
-            }
-          }
-        """.stripIndent())
       }
-    }
+      configure {
+         it / definition / lightweight(true)
+      }
   }
 }
