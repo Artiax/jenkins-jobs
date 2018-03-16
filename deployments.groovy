@@ -1,13 +1,11 @@
 folder('deployments');
 
 [
-
   [
     name:       'httpd',
     repository: 'https://github.com/Artiax/helm.git',
     branch:     'master'
   ]
-
 ].each { Map deployment ->
   pipelineJob("deployments/${deployment.name}") {
     parameters {
@@ -15,12 +13,20 @@ folder('deployments');
       stringParam('TAG','latest','Docker image build tag to use for this deployment.')
     }
     definition {
-      cps {
-        sandbox(true)
-        script("""
-
-        """.stripIndent())
+      cpsScm {
+        scm {
+          git {
+            branch("${deployment.branch}")
+            remote {
+              url("${deployment.repository}")
+            }
+          }
+        }
+        scriptPath("Jenkinsfile")
       }
+    }
+    configure {
+      it / definition / lightweight(true)
     }
   }
 }

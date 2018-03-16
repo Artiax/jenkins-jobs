@@ -1,7 +1,6 @@
 folder('images');
 
 [
-
   [
     name:       'jenkins',
     repository: 'https://github.com/Artiax/jenkins.git',
@@ -17,24 +16,23 @@ folder('images');
     repository: 'https://github.com/Artiax/httpd.git',
     branch:     'master'
   ]
-
 ].each { Map image ->
   pipelineJob("images/${image.name}") {
-      definition {
-          cpsScm {
-              scm {
-                  git {
-                      branch("${image.branch}")
-                      remote {
-                          url("${image.repository}")
-                      }
-                  }
-              }
-              scriptPath("Jenkinsfile")
+    definition {
+      cpsScm {
+        scm {
+          git {
+            branch("${image.branch}")
+            remote {
+              url("${image.repository}")
+            }
           }
+        }
+        scriptPath("Jenkinsfile")
       }
-      configure {
-         it / definition / lightweight(true)
-      }
+    }
+    configure {
+      it / definition / lightweight(true)
+    }
   }
 }

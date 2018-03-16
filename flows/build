@@ -1,15 +1,16 @@
+def scmVars;
 def name;
 def tag;
 def image;
 
 node('docker') {
   stage('Checkout') {
-    checkout scm
+    scmVars = checkout scm;
   }
 
   stage('Prepare') {
-    name = sh(returnStdout: true, script: 'basename -s .git `git config --get remote.origin.url`').trim()
-    commit = sh(returnStdout: true, script: 'git rev-parse HEAD').trim().take(8)
+    name = "${env.JOB_BASE_NAME}"
+    commit = "${scmVars.GIT_COMMIT}".take(8)
     timestamp = sh(returnStdout: true, script: "date '+%Y-%m-%d-%H%M'").trim()
     tag = "${timestamp}-${commit}"
 
