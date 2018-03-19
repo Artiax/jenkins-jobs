@@ -13,10 +13,10 @@ node('docker') {
   }
   stage('Deploy') {
     dir('charts') {
-      sh '''
-        export TILLER_HOST="tiller.kube-system.svc.cluster.local:\$(kubectl get svc -n kube-system tiller -o jsonpath='{.spec.ports[].port}')"
-        helm upgrade \${RELEASE_NAME} ./${name} --install --set deployment.imageTag=\${TAG}
-      '''.stripIndent()
+      sh """
+        export TILLER_HOST=tiller.kube-system.svc.cluster.local:\$(kubectl get svc -n kube-system tiller -o jsonpath='{.spec.ports[].port}')
+        helm upgrade \${RELEASE_NAME} ./${name} --install --set deployment.imageTag=\${TAG} --host \$TILLER_HOST
+      """
     }
   }
 }
