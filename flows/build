@@ -11,7 +11,7 @@ node('docker') {
   stage('Prepare') {
     name = "${env.JOB_BASE_NAME}"
     commit = "${scmVars.GIT_COMMIT}".take(8)
-    timestamp = sh(returnStdout: true, script: "date '+%Y-%m-%d-%H%M'").trim()
+    timestamp = Calendar.getInstance().getTime().format('YYYY-MM-dd-hhmm')
     tag = "${timestamp}-${commit}"
 
     echo "Name: ${name}"
@@ -25,5 +25,14 @@ node('docker') {
   stage('Tag') {
     currentBuild.displayName = "${tag}"
     image.tag "${tag}"
+  }
+}
+
+timeout(time: 15, unit: 'MINUTES') {
+  try {
+    def inputVars = input message: 'Deploy this image?', parameters: [string(defaultValue: '', description: 'Release name for helm deployment. Also used as a prefix to all kubernetes components.', name: 'RELEASE_NAME', trim: false)]
+    build job: "deployments/${name}", parameters: [string(name: 'RELEASE_NAME', value: "${inputVars}"), string(name: 'TAG', value: "${tag}")], wait: false
+  } catch(err) {
+    currentBuild.result = 'SUCCESS'
   }
 }
