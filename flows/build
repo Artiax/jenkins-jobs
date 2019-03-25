@@ -11,7 +11,7 @@ node('docker') {
   stage('Prepare') {
     name = "${env.JOB_BASE_NAME}"
     commit = "${scmVars.GIT_COMMIT}".take(8)
-    timestamp = Calendar.getInstance().getTime().format('YYYY-MM-dd-hhmm')
+    timestamp = Calendar.getInstance().getTime().format('YYYY-MM-dd-HHmm')
     tag = "${timestamp}-${commit}"
 
     echo "Name: ${name}"
